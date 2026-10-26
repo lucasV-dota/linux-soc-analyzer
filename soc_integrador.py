@@ -2,6 +2,8 @@
 from datetime import datetime, timedelta
 import subprocess
 import re
+import urllib.request
+import urllib.parse
 
 LISTA_BLANCA = ["127.0.0.1", "192.168.1.1", "10.0.0.5"]
 
@@ -20,6 +22,18 @@ ARCHIVOS_LOGS = "server_logs.txt"
 ARCHIVO_REPORTE = f"reporte_amenazas_{fecha_actual}.txt"
 ARCHIVO_ERRORES = "errores_script.txt"
 
+def enviar_alerta_telegram(ip_bloqueada):
+    token = "8629790663:AAE_nzNCqVQvTXMnsqBtPFQD9JI_xwCZSkc"
+    chat_id = "8966403751"
+    mensaje = f"🚨 *Alerta SOC* 🚨\nDefensa activa disparada. UFW acaba de bloquear la IP: `{ip_bloqueada}`"
+
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    datos = urllib.parse.urlencode({'chat_id': chat_id, 'text': mensaje, 'parse_mode': 'Markdown'}).encode('utf-8')
+
+    try:
+        urllib.request.urlopen(url, data=datos, timeout=5)
+    except Exception as e:
+        print(f"No se pudo enviar la alerta de Telegram: {e}")
 def obtener_timestamp():
 	"""Devuelve la fecha y hora actual para el reporte"""
 	return datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")
@@ -54,6 +68,8 @@ def bloquear_en_ufw(ip):
 
 
 	comando = ["sudo", "ufw", "deny", "from", ip]
+	os.system(comando)
+	enviar_alerta_telegram(ip)
 	try:
 		resultado = subprocess.run(comando, capture_output=True, text=True, check=True)
 		print(f"[BLOQUEADO] IP {ip} aislada en UFW.")
@@ -106,7 +122,7 @@ try:
                                         f_err.write(mensaje_error)
                                         print(f"[LOG CORRUPTO] Registrado en [ARCHIVO_ERRORES] (Linea {num_linea})")
 except FileNotFoundError:
-    print(f"[FALLO CRITICO] No se encontro el archivo de logs '{ARCHIVO_LOGS}'.")
+    print(f"[FALLO CRITICO] No se encontro el archivo de logs '{ARCHIVOS_LOGS}'.")
 
 print("====================================")
 print(" Procesamiento Finalizado       ")
