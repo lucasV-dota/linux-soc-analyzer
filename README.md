@@ -24,3 +24,4 @@ Este proyecto es un motor de defensa automatizado (Security Operations Center) d
 
 ---
 *Proyecto desarrollado por Lucas como laboratorio práctico de Ciberseguridad y Administración de Sistemas Linux.*
+
