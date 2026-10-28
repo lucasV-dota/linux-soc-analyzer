@@ -18,13 +18,21 @@ PUERTOS_SERVICIOS = {
 
 fecha_actual = datetime.now().strftime("%Y-%m-%d")
 
-ARCHIVOS_LOGS = "server_logs.txt"
+ARCHIVOS_LOGS = "/var/log/auth.log"
 ARCHIVO_REPORTE = f"reporte_amenazas_{fecha_actual}.txt"
 ARCHIVO_ERRORES = "errores_script.txt"
 
 def enviar_alerta_telegram(ip_bloqueada):
-    token = "8629790663:AAE_nzNCqVQvTXMnsqBtPFQD9JI_xwCZSkc"
-    chat_id = "8966403751"
+
+	try:
+		with open("memoria_ips.txt", "r") as f:
+			ips_guardadas = f.read()
+	except FileNotFoundError:
+		ips_guardadas = ""
+	if ip_bloqueada in ips_guardadas:
+		return
+    token = "TU_TOKEN_DE_TELEGRAM_AQUI"
+    chat_id = "TU_CHAT_ID_AQUI"
     mensaje = f"🚨 *Alerta SOC* 🚨\nDefensa activa disparada. UFW acaba de bloquear la IP: `{ip_bloqueada}`"
 
     url = f"https://api.telegram.org/bot{token}/sendMessage"
@@ -34,6 +42,8 @@ def enviar_alerta_telegram(ip_bloqueada):
         urllib.request.urlopen(url, data=datos, timeout=5)
     except Exception as e:
         print(f"No se pudo enviar la alerta de Telegram: {e}")
+	with open("memoria_ips.txt", "a") as f:
+		f.write(ip_bloqueada + "\n")
 def obtener_timestamp():
 	"""Devuelve la fecha y hora actual para el reporte"""
 	return datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")
