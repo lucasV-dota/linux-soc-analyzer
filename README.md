@@ -1,27 +1,58 @@
-# 🛡️ Linux Mini-SOC: Analizador de Logs y Defensa Automatizada
+# 🛡️ Linux SOC Analyzer & Active Defense System
 
-Este proyecto es un motor de defensa automatizado (Security Operations Center) diseñado para servidores Ubuntu. Monitorea registros del sistema en tiempo real, detecta patrones de ataques de fuerza bruta mediante Expresiones Regulares (Regex) y aísla a los atacantes interactuando directamente con el firewall UFW.
+Un analizador de logs SOC (Security Operations Center) y motor de defensa activa automatizado de nivel industrial, escrito en Python y empaquetado en contenedores Docker. 
 
-## 🚀 Características Principales
-* **Análisis Forense con Regex:** Filtra cientos de líneas de logs para extraer únicamente los intentos fallidos de autenticación (SSH).
-* **Defensa Activa (IPS):** Si una dirección IP supera el umbral de intentos fallidos, el script se comunica con el sistema operativo para crear una regla de bloqueo total en UFW.
-* **Tolerancia a Fallos:** Manejo de excepciones en Python para evitar que el script colapse ante logs corruptos o vacíos.
-* **Automatización Invisible:** Operación autónoma en segundo plano como un demonio de sistema utilizando `Cron` (ejecución cada 5 minutos).
-* **Hardening de SSH:** El servidor de despliegue cuenta con bloqueo de usuario root, autenticación exclusiva por llaves criptográficas (Ed25519) y ofuscación de puerto.
-
-## 🛠️ Tecnologías Utilizadas
-* **Lenguaje:** Python 3
-* **Sistema Operativo:** Ubuntu 26.04 LTS
-* **Seguridad:** UFW (Uncomplicated Firewall), OpenSSH
-* **Automatización:** Crontab (Linux Daemon)
-
-## 📋 Arquitectura del Flujo
-1. `Cron` despierta el script silenciosamente.
-2. Python lee y procesa `/var/log/auth.log`.
-3. El motor de Expresiones Regulares identifica patrones anómalos.
-4. Se extrae la IP hostil.
-5. Se invoca al sistema (`subprocess`) para inyectar la regla en UFW.
+Este sistema monitorea en tiempo real los registros de autenticación del sistema (`/var/log/auth.log`), detecta e identifica intentos de ataques por fuerza bruta mediante expresiones regulares (Regex), aplica bloqueos automáticos en el cortafuegos de Linux (UFW) y despacha alertas en tiempo real a Telegram con persistencia anti-spam.
 
 ---
-*Proyecto desarrollado por Lucas como laboratorio práctico de Ciberseguridad y Administración de Sistemas Linux.*
 
+## 📐 Arquitectura del Sistema
+
+El proyecto implementa el patrón de diseño **Wrapper/Daemon** para garantizar disponibilidad 24/7 y ejecución resiliente sin interrupción del servicio:
+
+```text
+ [/var/log/auth.log] 
+          │
+          ▼ (Lectura sólo lectura :ro)
+  ┌───────────────┐
+  │  Docker Cont. │ ───► daemon_soc.py (Bucle Daemon 24/7)
+  └───────────────┘           │
+                              ▼ (Ejecuta cada 30s)
+                     soc_integrador.py (Motor Regex)
+                              │
+                              ├─► Evalúa estado / Anti-Spam (memoria_ips.txt)
+                              ├─► Aplica Bloqueo Firewall (UFW via NET_ADMIN)
+                              └─► Despacha Alerta (Telegram Bot API via .env)
+
+✨ Características Principales
+Análisis de Logs mediante Regex: Extracción precisa de direcciones IPv4, puertos, servicios atacados y fechas relativas desde eventos del sistema.
+
+Defensa Activa Automatizada: Bloqueo de direcciones IP atacantes directamente en el firewall ufw del host con privilegios mínimos (NET_ADMIN).
+
+Patrón Wrapper Daemon: Bucle de control independiente en Python (daemon_soc.py) que ejecuta escaneos periódicos garantizando tolerancia a fallos.
+
+Persistencia y Anti-Spam: Sistema de memoria de estado local (memoria_ips.txt) que evita re-procesar alertas sobre incidentes ya mitigados.
+
+Notificaciones en Tiempo Real: Integración con la API de Bots de Telegram para enviar reportes formateados de eventos críticos de seguridad.
+
+DevOps & Security First: Manejo estricto de secretos mediante variables de entorno (.env), archivos excluidos en .gitignore y ejecución aislada mediante Docker.
+
+🛠️ Tecnologías Utilizadas
+
+Lenguaje: Python 3.10+ (re, os, urllib, subprocess, datetime)
+
+Contenedores: Docker (Dockerfile, aislamientos de red y capacidades de kernel)
+
+Seguridad & Red: Linux UFW (Uncomplicated Firewall), Regex Log Analysis, Telegram API
+
+Control de Versiones: Git / GitHub
+
+📂 Estructura del Proyecto
+
+.
+├── Dockerfile              # Configuración de empaquetado de la imagen Docker
+├── daemon_soc.py          # Wrapper Daemon de ejecución continua 24/7
+├── soc_integrador.py      # Motor principal de parsing, bloqueo y alertas
+├── .env.example           # Plantilla genérica para variables de entorno
+├── .gitignore             # Exclusión de credenciales y registros locales
+└── README.md              # Documentación del proyecto
