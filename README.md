@@ -68,35 +68,3 @@ Control de Versiones: Git / GitHub
 
 👤 Autor
 Lucas Matias Villalobo - DevOps & Security Operations Enthusiast
-
-
----
-
-<Sequence>
-  <Step subtitle="Crear la plantilla de credenciales" title="Crear .env.example para GitHub">
-    Es un estándar en la industria dejar un archivo de ejemplo público en GitHub para que otros sepan qué variables utiliza el proyecto.
-    Crea el archivo `.env.example`:
-    ```bash
-    nano .env.example
-    ```
-    Agrega estas dos líneas y guarda (`Ctrl+O`, `Enter`, `Ctrl+X`):
-    ```env
-    TELEGRAM_TOKEN=TU_TOKEN_DE_TELEGRAM_AQUI
-    TELEGRAM_CHAT_ID=TU_CHAT_ID_AQUI
-    ```
-  </Step>
-
-  <Step subtitle="Guardar la documentación" title="Subir el README y la plantilla a GitHub">
-    Empaqueta y sube la nueva documentación a tu repositorio:
-    ```bash
-    git add README.md .env.example
-    git commit -m "docs(readme): agrega documentacion profesional del proyecto y plantilla .env.example"
-    git push origin main
-    ```
-  </Step>
-</Sequence>
-
-<ElicitationsGroup message="Con la documentación completa y tu perfil de GitHub destacado, ¿qué paso sigue en tu entrenamiento?">
-  <Elicitation label="Aprender Docker Compose" query="Quiero aprender a crear un archivo docker-compose.yml para levantar el SOC y sus variables de entorno con un solo comando simplificado."/>
-  <Elicitation label="Simular ataque y probar alertas" query="Quiero realizar una prueba real de ataque desde otra máquina o contenedor para verificar el flujo de bloqueo y la alerta de Telegram."/>
-</ElicitationsGroup>
