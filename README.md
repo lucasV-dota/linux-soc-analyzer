@@ -24,7 +24,10 @@ El proyecto implementa el patrón de diseño **Wrapper/Daemon** para garantizar 
                               ├─► Aplica Bloqueo Firewall (UFW via NET_ADMIN)
                               └─► Despacha Alerta (Telegram Bot API via .env)
 
+
 ✨ Características Principales
+
+
 Análisis de Logs mediante Regex: Extracción precisa de direcciones IPv4, puertos, servicios atacados y fechas relativas desde eventos del sistema.
 
 Defensa Activa Automatizada: Bloqueo de direcciones IP atacantes directamente en el firewall ufw del host con privilegios mínimos (NET_ADMIN).
@@ -37,7 +40,10 @@ Notificaciones en Tiempo Real: Integración con la API de Bots de Telegram para 
 
 DevOps & Security First: Manejo estricto de secretos mediante variables de entorno (.env), archivos excluidos en .gitignore y ejecución aislada mediante Docker.
 
+
+
 🛠️ Tecnologías Utilizadas
+
 
 Lenguaje: Python 3.10+ (re, os, urllib, subprocess, datetime)
 
@@ -46,6 +52,8 @@ Contenedores: Docker (Dockerfile, aislamientos de red y capacidades de kernel)
 Seguridad & Red: Linux UFW (Uncomplicated Firewall), Regex Log Analysis, Telegram API
 
 Control de Versiones: Git / GitHub
+
+
 
 📂 Estructura del Proyecto
 
